@@ -152,8 +152,26 @@ function switchAuth(tab) {
   document.getElementById('registerForm').classList.toggle('hidden', tab!=='register');
 }
 
-function login() {
-  APP.currentUser = { id:'u1', name:'Kofi Mensah', role:'creator', avatar:'https://api.dicebear.com/7.x/avataaars/svg?seed=user1' };
+function login()async function login() {
+  try {
+    const email = document.getElementById('loginEmail')?.value || 'demo@afristream.tg';
+    const password = document.getElementById('loginPass')?.value || 'demo1234';
+
+    const res = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('afristream_token', data.token);
+      APP.currentUser = data.user;
+    }
+  } catch(err) {
+    console.log('Mode démo activé');
+  }
+
   document.getElementById('authOverlay').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   showPage('home');
@@ -551,9 +569,47 @@ function simulateUpload(filename) {
   }, 300);
 }
 
-function publishVideo() {
+function publishVideo()async function publishVideo() {
   const title = document.getElementById('videoTitle').value.trim();
-  if(!title) { showToast('Titre obligatoire!', 'error'); return; }
+  const file = document.getElementById('videoFileInput').files[0];
+  if (!title) { showToast('Titre obligatoire!', 'error'); return; }
+  if (!file)  { showToast('Choisis une vidéo!', 'error'); return; }
+
+  const token = localStorage.getItem('afristream_token');
+  if (!token) { showToast('Connecte-toi d\'abord!', 'error'); return; }
+
+  const formData = new FormData();
+  formData.append('video', file);
+  formData.append('title', title);
+  formData.append('description', document.getElementById('videoDesc').value);
+  formData.append('category', document.getElementById('videoCategory').value || 'Divertissement');
+  formData.append('tags', JSON.stringify(document.getElementById('videoTags').value.split(' ').filter(Boolean)));
+  formData.append('isPremium', document.getElementById('isPremium')?.checked ? 'true' : 'false');
+  formData.append('premiumPrice', document.getElementById('premiumPrice')?.value || '0');
+
+  document.getElementById('uploadProgressBar').style.width = '30%';
+  document.getElementById('uploadProgressText').textContent = 'Upload en cours...';
+  document.getElementById('uploadProgress').classList.remove('hidden');
+
+  try {
+    const res = await fetch(`${API_URL}/api/videos/upload`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur upload');
+    document.getElementById('uploadProgressBar').style.width = '100%';
+    document.getElementById('uploadProgressText').textContent = '✓ Vidéo publiée!';
+    setTimeout(() => {
+      closeModal('uploadModal');
+      showPage('home');
+      showToast(`✓ "${title}" publié! Traitement en cours...`, 'success');
+    }, 1000);
+  } catch(err) {
+    showToast('Erreur: ' + err.message, 'error');
+  }
+} 
   const isPremium = document.getElementById('isPremium')?.checked;
   const premiumPrice = isPremium ? parseInt(document.getElementById('premiumPrice')?.value) : 0;
   const col = THUMB_COLORS[Math.floor(Math.random() * THUMB_COLORS.length)];
