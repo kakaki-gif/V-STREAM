@@ -1,4 +1,4 @@
-// ============================================================
+const API_URL = 'https://v-stream-production.up.railway.app';// 
 // AFRISTREAM — APPLICATION JAVASCRIPT
 // Plateforme vidéo africaine complète
 // ============================================================
