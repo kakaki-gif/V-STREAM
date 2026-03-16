@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AfriStream — Plateforme Vidéo Africaine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" class="overlay active">
+  <div class="auth-container">
+    <div class="auth-brand">
+      <div class="brand-logo">▶</div>
+      <h1>AfriStream</h1>
+      <p>La plateforme vidéo africaine</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('login')">Connexion</button>
+      <button class="auth-tab" onclick="switchAuth('register')">Inscription</button>
+    </div>
+    <div id="loginForm" class="auth-form">
+      <input type="email" placeholder="Email" class="input-field" id="loginEmail">
+      <input type="password" placeholder="Mot de passe" class="input-field" id="loginPass">
+      <button class="btn-primary" onclick="login()">Se connecter</button>
+      <p class="auth-note">Démo: cliquez directement pour continuer</p>
+    </div>
+    <div id="registerForm" class="auth-form hidden">
+      <input type="text" placeholder="Nom complet" class="input-field">
+      <input type="email" placeholder="Email" class="input-field">
+      <input type="password" placeholder="Mot de passe (8+ car.)" class="input-field">
+      <select class="input-field">
+        <option>Utilisateur</option>
+        <option>Créateur</option>
+      </select>
+      <button class="btn-primary" onclick="login()">Créer un compte</button>
+    </div>
+    <div class="auth-social">
+      <button class="btn-social" onclick="login()">Continuer avec Google</button>
+      <button class="btn-social" onclick="login()">Continuer avec Facebook</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">▶</div>
+      <span>AfriStream</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" onclick="showPage('home')"><span class="nav-icon">⊞</span>Accueil</a>
+      <a class="nav-item" onclick="showPage('trending')"><span class="nav-icon">↗</span>Tendances</a>
+      <a class="nav-item" onclick="showPage('premium')"><span class="nav-icon">◆</span>Premium</a>
+      <a class="nav-item" onclick="showPage('live')"><span class="nav-icon">●</span>Live</a>
+      <a class="nav-item" onclick="showPage('subscriptions')"><span class="nav-icon">♥</span>Abonnements</a>
+      <a class="nav-item" onclick="showPage('messages')"><span class="nav-icon">✉</span>Messages <span class="badge">3</span></a>
+      <a class="nav-item" onclick="showPage('wallet')"><span class="nav-icon">◎</span>Wallet</a>
+      <a class="nav-item" onclick="showPage('stats')"><span class="nav-icon">▦</span>Statistiques</a>
+      <a class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙</span>Paramètres</a>
+    </nav>
+    <div class="sidebar-categories">
+      <p class="category-title">Catégories</p>
+      <div class="category-tags">
+        <span class="tag" onclick="filterCategory('Musique')">Musique</span>
+        <span class="tag" onclick="filterCategory('Sports')">Sports</span>
+        <span class="tag" onclick="filterCategory('Tech')">Tech</span>
+        <span class="tag" onclick="filterCategory('Cuisine')">Cuisine</span>
+        <span class="tag" onclick="filterCategory('Mode')">Mode</span>
+        <span class="tag" onclick="filterCategory('Éducation')">Éducation</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="search-bar">
+        <input type="text" placeholder="Rechercher vidéos, créateurs, hashtags..." id="searchInput" oninput="searchVideos(this.value)">
+        <button class="search-btn">⌕</button>
+        <div id="searchDropdown" class="search-dropdown hidden"></div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-upload" onclick="showUploadModal()">+ Publier</button>
+        <button class="notif-btn" onclick="showPage('notifications')">
+          <span>🔔</span><span class="notif-dot"></span>
+        </button>
+        <div class="avatar-btn" onclick="showPage('profile')">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="Avatar">
+        </div>
+      </div>
+    </header>
+
+    <!-- PAGES -->
+    <div id="pageHome" class="page active">
+      <!-- HERO BANNER -->
+      <div class="hero-banner">
+        <div class="hero-content">
+          <span class="hero-badge">● LIVE MAINTENANT</span>
+          <h2>Koffi Olomide en Concert</h2>
+          <p>Regardez en direct depuis Lomé — 12,450 spectateurs</p>
+          <button class="btn-hero" onclick="showVideoPlayer('live1')">Regarder Live</button>
+        </div>
+        <div class="hero-thumb"></div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter(this,'all')">Tout</button>
+        <button class="filter-btn" onclick="setFilter(this,'recent')">Récent</button>
+        <button class="filter-btn" onclick="setFilter(this,'trending')">Tendances</button>
+        <button class="filter-btn" onclick="setFilter(this,'music')">Musique</button>
+        <button class="filter-btn" onclick="setFilter(this,'sports')">Sports</button>
+        <button class="filter-btn" onclick="setFilter(this,'tech')">Tech</button>
+        <button class="filter-btn" onclick="setFilter(this,'premium')">⭐ Premium</button>
+      </div>
+
+      <!-- VIDEO GRID -->
+      <div class="video-grid" id="videoGrid"></div>
+    </div>
+
+    <div id="pageTrending" class="page hidden">
+      <h2 class="page-title">🔥 Tendances en Afrique</h2>
+      <div class="trending-list" id="trendingList"></div>
+    </div>
+
+    <div id="pagePremium" class="page hidden">
+      <div class="premium-header">
+        <h2>◆ Contenu Premium</h2>
+        <p>Avant-premières exclusives et contenus payants</p>
+      </div>
+      <div class="video-grid" id="premiumGrid"></div>
+    </div>
+
+    <div id="pageLive" class="page hidden">
+      <div class="live-header">
+        <h2>● Lives en cours</h2>
+        <button class="btn-primary" onclick="showStartLiveModal()">Démarrer un Live</button>
+      </div>
+      <div class="video-grid" id="liveGrid"></div>
+    </div>
+
+    <div id="pageSubscriptions" class="page hidden">
+      <h2 class="page-title">♥ Mes Abonnements</h2>
+      <div class="creators-grid" id="subscriptionsList"></div>
+      <h3 style="margin-top:2rem;">Dernières vidéos</h3>
+      <div class="video-grid" id="subVideos"></div>
+    </div>
+
+    <div id="pageMessages" class="page hidden">
+      <div class="messages-layout">
+        <div class="conversations-list" id="conversationsList"></div>
+        <div class="chat-area" id="chatArea">
+          <div class="chat-empty">Sélectionnez une conversation</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pageWallet" class="page hidden">
+      <div class="wallet-container">
+        <div class="wallet-card">
+          <p class="wallet-label">Solde disponible</p>
+          <h2 class="wallet-balance" id="walletBalance">47,500 FCFA</h2>
+          <div class="wallet-actions">
+            <button class="btn-primary" onclick="showModal('depositModal')">Recharger</button>
+            <button class="btn-secondary" onclick="showModal('withdrawModal')">Retirer</button>
+          </div>
+        </div>
+        <div class="wallet-stats">
+          <div class="stat-card"><span>Reçu ce mois</span><strong>23,000 FCFA</strong></div>
+          <div class="stat-card"><span>Pourboires</span><strong>8,500 FCFA</strong></div>
+          <div class="stat-card"><span>Premium</span><strong>12,000 FCFA</strong></div>
+          <div class="stat-card"><span>Retirés</span><strong>15,000 FCFA</strong></div>
+        </div>
+        <div class="transactions-list">
+          <h3>Historique des transactions</h3>
+          <div id="transactionsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pageStats" class="page hidden">
+      <h2 class="page-title">📊 Tableau de bord créateur</h2>
+      <div class="stats-grid">
+        <div class="stat-card big"><span>Vues totales</span><strong id="totalViews">284,920</strong></div>
+        <div class="stat-card big"><span>Revenus totaux</span><strong>156,400 FCFA</strong></div>
+        <div class="stat-card big"><span>Abonnés</span><strong>4,820</strong></div>
+        <div class="stat-card big"><span>Vidéos publiées</span><strong>47</strong></div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h4>Vues (30 derniers jours)</h4>
+          <canvas id="viewsChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>Revenus par source</h4>
+          <canvas id="revenueChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="pageProfile" class="page hidden">
+      <div class="profile-banner"></div>
+      <div class="profile-info">
+        <img class="profile-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="">
+        <div class="profile-details">
+          <h2>Kofi Mensah <span class="verified-badge">✓</span></h2>
+          <p class="profile-bio">Créateur de contenu musical 🎵 | Lomé, Togo | 4.8K abonnés</p>
+          <div class="profile-stats">
+            <span><strong>47</strong> Vidéos</span>
+            <span><strong>4,820</strong> Abonnés</span>
+            <span><strong>312</strong> Abonnements</span>
+          </div>
+          <div class="profile-actions">
+            <button class="btn-primary" onclick="showUploadModal()">+ Publier</button>
+            <button class="btn-secondary">Modifier profil</button>
+          </div>
+        </div>
+      </div>
+      <div class="video-grid" id="profileVideos"></div>
+    </div>
+
+    <div id="pageNotifications" class="page hidden">
+      <h2 class="page-title">🔔 Notifications</h2>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <div id="pageSettings" class="page hidden">
+      <h2 class="page-title">⚙ Paramètres</h2>
+      <div class="settings-container">
+        <div class="settings-section">
+          <h3>Apparence</h3>
+          <div class="setting-row">
+            <span>Thème</span>
+            <div class="theme-toggle">
+              <button class="btn-theme active" onclick="setTheme('dark',this)">Sombre</button>
+              <button class="btn-theme" onclick="setTheme('light',this)">Clair</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span>Couleur d'accent</span>
+            <div class="color-picker">
+              <div class="color-dot active" style="background:#FF6B35" onclick="setAccent('#FF6B35',this)"></div>
+              <div class="color-dot" style="background:#00D4AA" onclick="setAccent('#00D4AA',this)"></div>
+              <div class="color-dot" style="background:#7B61FF" onclick="setAccent('#7B61FF',this)"></div>
+              <div class="color-dot" style="background:#FFD700" onclick="setAccent('#FFD700',this)"></div>
+              <div class="color-dot" style="background:#FF4081" onclick="setAccent('#FF4081',this)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Notifications</h3>
+          <div class="setting-row"><span>Nouvelles vidéos</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="setting-row"><span>Commentaires</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="setting-row"><span>Pourboires reçus</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+        </div>
+        <div class="settings-section">
+          <h3>Monétisation</h3>
+          <div class="setting-row"><span>Prix avant-première</span><input type="number" class="input-sm" value="500" min="100"></div>
+          <div class="setting-row"><span>Abonnement mensuel</span><input type="number" class="input-sm" value="2000" min="500"></div>
+        </div>
+        <div class="settings-section danger">
+          <h3>Compte</h3>
+          <button class="btn-danger" onclick="logout()">Se déconnecter</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pageAdmin" class="page hidden">
+      <h2 class="page-title">🚨 Administration</h2>
+      <div class="admin-stats">
+        <div class="stat-card"><span>Utilisateurs</span><strong>12,840</strong></div>
+        <div class="stat-card"><span>Vidéos actives</span><strong>48,230</strong></div>
+        <div class="stat-card"><span>Signalements</span><strong style="color:#ff4444">127</strong></div>
+        <div class="stat-card"><span>Revenus plateforme</span><strong>1,240,000 FCFA</strong></div>
+      </div>
+      <h3>Contenus signalés</h3>
+      <div id="reportedContent"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- VIDEO PLAYER MODAL -->
+<div id="videoPlayerModal" class="modal-overlay hidden">
+  <div class="video-modal">
+    <button class="modal-close" onclick="closeVideoPlayer()">✕</button>
+    <div class="video-player-wrap">
+      <div class="video-player" id="videoPlayer">
+        <div class="play-overlay" id="playOverlay" onclick="togglePlay()">
+          <div class="play-btn-big" id="playBtnBig">▶</div>
+        </div>
+        <div class="video-controls">
+          <div class="progress-bar-wrap" onclick="seekVideo(event)">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <div class="controls-row">
+            <button onclick="togglePlay()" id="playPauseBtn">▶</button>
+            <span class="time-display" id="timeDisplay">0:00 / 5:42</span>
+            <div class="volume-ctrl">
+              <button>🔊</button>
+              <input type="range" min="0" max="100" value="80" class="volume-slider">
+            </div>
+            <select class="quality-select">
+              <option>1080p</option>
+              <option>720p</option>
+              <option>480p</option>
+              <option>360p</option>
+            </select>
+            <button onclick="toggleFullscreen()">⛶</button>
+          </div>
+        </div>
+      </div>
+      <div id="premiumGate" class="premium-gate hidden">
+        <div class="gate-icon">◆</div>
+        <h3>Contenu Premium</h3>
+        <p id="gatePrice">Accès: 1,000 FCFA</p>
+        <button class="btn-primary" onclick="payForContent()">Déverrouiller maintenant</button>
+      </div>
+    </div>
+    <div class="video-info-panel" id="videoInfoPanel"></div>
+  </div>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div id="uploadModal" class="modal-overlay hidden">
+  <div class="upload-modal">
+    <div class="modal-header">
+      <h3>Publier une vidéo</h3>
+      <button onclick="closeModal('uploadModal')">✕</button>
+    </div>
+    <div class="upload-drop-zone" id="dropZone" ondrop="handleDrop(event)" ondragover="event.preventDefault()">
+      <div class="drop-icon">📤</div>
+      <p>Glissez votre vidéo ici</p>
+      <span>ou</span>
+      <input type="file" id="videoFileInput" accept="video/*" onchange="handleFileSelect(event)" hidden>
+      <button class="btn-secondary" onclick="document.getElementById('videoFileInput').click()">Choisir un fichier</button>
+    </div>
+    <div id="uploadProgress" class="hidden">
+      <div class="progress-track">
+        <div class="progress-fill" id="uploadProgressBar"></div>
+      </div>
+      <span id="uploadProgressText">Compression en cours... 0%</span>
+    </div>
+    <div class="upload-form">
+      <input type="text" class="input-field" placeholder="Titre de la vidéo *" id="videoTitle">
+      <textarea class="input-field" placeholder="Description..." id="videoDesc" rows="3"></textarea>
+      <input type="text" class="input-field" placeholder="#hashtags séparés par espace" id="videoTags">
+      <select class="input-field" id="videoCategory">
+        <option value="">Catégorie</option>
+        <option>Musique</option><option>Sports</option><option>Tech</option>
+        <option>Cuisine</option><option>Mode</option><option>Éducation</option>
+        <option>Divertissement</option>
+      </select>
+      <div class="upload-options">
+        <label class="option-row">
+          <input type="checkbox" id="isPremium"> Avant-première payante
+        </label>
+        <div id="premiumPriceRow" class="hidden option-row">
+          <span>Prix d'accès:</span>
+          <input type="number" class="input-sm" value="500" min="100" id="premiumPrice"> FCFA
+        </div>
+        <label class="option-row">
+          <input type="checkbox" id="isPublicLater"> Rendre public après
+          <input type="number" class="input-sm" value="7" min="1" id="publicDays"> jours
+        </label>
+      </div>
+      <button class="btn-primary full-width" onclick="publishVideo()">Publier</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIP MODAL -->
+<div id="tipModal" class="modal-overlay hidden">
+  <div class="tip-modal">
+    <div class="modal-header">
+      <h3>💸 Envoyer un pourboire</h3>
+      <button onclick="closeModal('tipModal')">✕</button>
+    </div>
+    <p class="tip-to" id="tipTo">À: Kofi Mensah</p>
+    <div class="tip-amounts">
+      <button class="tip-btn" onclick="setTip(100)">100 FCFA</button>
+      <button class="tip-btn" onclick="setTip(500)">500 FCFA</button>
+      <button class="tip-btn active" onclick="setTip(1000)">1,000 FCFA</button>
+      <button class="tip-btn" onclick="setTip(2000)">2,000 FCFA</button>
+      <button class="tip-btn" onclick="setTip(5000)">5,000 FCFA</button>
+    </div>
+    <div class="custom-tip">
+      <input type="number" class="input-field" id="customTip" placeholder="Montant personnalisé (FCFA)" min="50">
+    </div>
+    <p class="tip-selected">Montant: <strong id="tipAmount">1,000 FCFA</strong></p>
+    <div class="payment-methods">
+      <button class="pay-method active" onclick="setPayMethod(this,'momo')">📱 Mobile Money</button>
+      <button class="pay-method" onclick="setPayMethod(this,'card')">💳 Carte</button>
+      <button class="pay-method" onclick="setPayMethod(this,'wallet')">◎ Wallet</button>
+    </div>
+    <button class="btn-primary full-width" onclick="sendTip()">Envoyer le pourboire</button>
+  </div>
+</div>
+
+<!-- START LIVE MODAL -->
+<div id="startLiveModal" class="modal-overlay hidden">
+  <div class="upload-modal">
+    <div class="modal-header">
+      <h3>● Démarrer un Live</h3>
+      <button onclick="closeModal('startLiveModal')">✕</button>
+    </div>
+    <input type="text" class="input-field" placeholder="Titre du live">
+    <select class="input-field">
+      <option>Live public (gratuit)</option>
+      <option>Live privé payant</option>
+    </select>
+    <div class="option-row" id="livePriceRow">
+      <span>Prix d'accès:</span>
+      <input type="number" class="input-sm" value="500"> FCFA
+    </div>
+    <button class="btn-primary full-width" style="background:#ff4444">● Démarrer le Live</button>
+  </div>
+</div>
+
+<!-- DEPOSIT MODAL -->
+<div id="depositModal" class="modal-overlay hidden">
+  <div class="tip-modal">
+    <div class="modal-header"><h3>Recharger Wallet</h3><button onclick="closeModal('depositModal')">✕</button></div>
+    <div class="tip-amounts">
+      <button class="tip-btn" onclick="setTip(1000)">1,000 F</button>
+      <button class="tip-btn" onclick="setTip(5000)">5,000 F</button>
+      <button class="tip-btn active" onclick="setTip(10000)">10,000 F</button>
+      <button class="tip-btn" onclick="setTip(25000)">25,000 F</button>
+    </div>
+    <input type="number" class="input-field" placeholder="Autre montant (FCFA)">
+    <div class="payment-methods">
+      <button class="pay-method active">📱 Flooz</button>
+      <button class="pay-method">📱 T-Money</button>
+      <button class="pay-method">📱 Wave</button>
+      <button class="pay-method">💳 Carte</button>
+    </div>
+    <button class="btn-primary full-width" onclick="deposit()">Recharger</button>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div id="withdrawModal" class="modal-overlay hidden">
+  <div class="tip-modal">
+    <div class="modal-header"><h3>Retirer des fonds</h3><button onclick="closeModal('withdrawModal')">✕</button></div>
+    <p class="tip-to">Solde: <strong>47,500 FCFA</strong></p>
+    <input type="number" class="input-field" placeholder="Montant à retirer (FCFA)" min="1000">
+    <select class="input-field">
+      <option>Mobile Money (Flooz)</option>
+      <option>Mobile Money (T-Money)</option>
+      <option>Wave</option>
+      <option>Virement bancaire</option>
+    </select>
+    <input type="text" class="input-field" placeholder="Numéro / IBAN">
+    <p class="tip-to" style="font-size:12px;color:#aaa">Commission plateforme: 10% | Minimum: 1,000 FCFA</p>
+    <button class="btn-primary full-width" onclick="withdraw()">Demander le retrait</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
