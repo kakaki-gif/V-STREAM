@@ -28,7 +28,7 @@ const io     = new Server(server, {
   cors: { origin: process.env.FRONTEND_URL || '*', methods: ['GET','POST'] }
 });
 
-const PORT          = process.env.PORT || 5000;
+const PORT = process.env.PORT || process.env.RAILWAY_PORT || 3000;
 const JWT_SECRET    = process.env.JWT_SECRET || 'afristream_dev_secret_2025';
 const JWT_EXPIRES   = '7d';
 const PLATFORM_FEE  = parseFloat(process.env.PLATFORM_FEE || '0.10');
@@ -909,7 +909,7 @@ async function start() {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/afristream');
     console.log('✓ MongoDB connecté');
 
-    server.listen(PORT, () => {
+    server.listen(PORT, "0.0.0.0", () => {
       console.log(`✓ AfriStream API démarré — port ${PORT}`);
       console.log(`✓ Socket.IO temps réel actif`);
       console.log(`✓ Health check: http://localhost:${PORT}/api/health`);
